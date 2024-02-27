@@ -9,6 +9,8 @@ TagManager:
   - Enemy
   - FlyEnemy
   - Button
+  - StillEnemy
+  - Terrain
   layers:
   - Default
   - TransparentFX

@@ -18,6 +18,9 @@ public class Health : MonoBehaviour
     private SpriteRenderer spriteRend;
     private Rigidbody2D rb2d;
 
+    // [SerializeField] private AudioSource deathSoundEffect;
+    // [SerializeField] private AudioSource hurtSoundEffect;
+
     private void Awake()
     {
         currentHealth = startingHealth;
@@ -32,9 +35,13 @@ public class Health : MonoBehaviour
         {
             currentHealth = Mathf.Clamp(currentHealth - _damage, 0, startingHealth);
             if (currentHealth > 0)
-            {
+            {   
                 anim.SetTrigger("hurt");
                 StartCoroutine(Invulnerability());
+                // if(CompareTag("Player"))
+                // {
+                //     hurtSoundEffect.Play();
+                // }
                 if (CompareTag("Player") && damageSourceTag == "Traps")
                 {
                     if (rb2d != null)
@@ -42,13 +49,11 @@ public class Health : MonoBehaviour
                         rb2d.velocity = new Vector2(rb2d.velocity.x, hurtJumpForce);
                     }
                 }
-
-                else if (CompareTag("Enemy") && GetComponent<MeleeEnemy>() != null)
+                if (CompareTag("Enemy") && GetComponent<MeleeEnemy>() != null)
                 {
                     GetComponent<MeleeEnemy>().HandleHurt();
                 }
-                
-                else if (CompareTag("FlyEnemy") && GetComponent<MeleeEnemy>() != null)
+                if (CompareTag("FlyEnemy") && GetComponent<MeleeEnemy>() != null)
                 {
                     GetComponent<MeleeEnemy>().HandleHurt();
                 }
@@ -65,12 +70,15 @@ public class Health : MonoBehaviour
         if(!dead)
         {
             dead = true;
+            // deathSoundEffect.Play();
             anim.SetTrigger("death");
+            
 
             if(CompareTag("Player"))
             {
-                spriteRend.color = new Color(1, 0, 0, 0.8f);
-                spriteRend.color = Color.white;
+                spriteRend = GetComponent<SpriteRenderer>();
+                Color newColor = new Color(1f, 0f, 0f, 0.8f);
+                spriteRend.color = newColor;
                 if(GetComponent<PlayerMovement>() != null)
                 {
                     GetComponent<PlayerMovement>().enabled = false;
@@ -91,7 +99,7 @@ public class Health : MonoBehaviour
                 if (rb2d != null)
                 {
                     rb2d.bodyType = RigidbodyType2D.Dynamic;
-                    rb2d.gravityScale = 1.0f; // Adjust the gravity scale as needed
+                    rb2d.gravityScale = 1.0f; 
                     rb2d.AddForce(Vector2.down * 0.5f, ForceMode2D.Impulse);
                 }
                 if(GetComponentInParent<EnemyPatrol>() != null)
@@ -149,6 +157,19 @@ public class Health : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void RestartLevel()
+    {
+        anim.SetTrigger("death");
+        StartCoroutine(ReloadSceneAfterAnimation());
+    }
+
+    IEnumerator ReloadSceneAfterAnimation()
+    {
+        yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length+10);
+        
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
 }

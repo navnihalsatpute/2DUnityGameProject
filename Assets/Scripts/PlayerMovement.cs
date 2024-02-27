@@ -11,9 +11,17 @@ public class PlayerMovement : MonoBehaviour
     private Animator anim;
     [SerializeField] private LayerMask jumpableGround;
 
+    // [SerializeField] private AudioSource attackSoundEffect;
+    [SerializeField] private AudioSource jumpSoundEffect;
 
-    private float dirX = 0f;
-    [SerializeField] private float moveSpeed = 7f;
+    // private float dirX = 0f;
+    [SerializeField] private float speed = 7f;
+    private float horizontalMove;
+    private bool moveRight;
+    private bool moveLeft;
+    private bool isjumping;
+    private bool isattack;
+
     [SerializeField] private float jumpForce = 14f;
 
     [SerializeField] private Transform attackPoint;
@@ -21,7 +29,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask enemyLayers;
     private bool isFacingRight = true;
 
-    private enum MovementState {idle, running, jumping, attack}
+    private enum MovementState {idle, running, jumping, attack, falling}
 
     public GameObject pauseMenuScreen;
 
@@ -32,42 +40,51 @@ public class PlayerMovement : MonoBehaviour
         coll = GetComponent<BoxCollider2D>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
+        moveLeft = false;
+        moveRight = false;
+        isjumping = false;
+        isattack = false;
     }
 
     private void Update()
     {
-        if(GetComponent<Health>().currentHealth > 0)
-        {
-            dirX = Input.GetAxisRaw("Horizontal");
-            rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y);
-
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                if(!pauseMenuScreen.activeSelf)
-                {
-                    Time.timeScale = 0;
-                    pauseMenuScreen.SetActive(true);
-                }
-                else
-                {
-                    Time.timeScale = 1;
-                    pauseMenuScreen.SetActive(false);
-                }
-            }
-
-            if(Input.GetButtonDown("Jump") && IsGrounded())
-            {
-                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-            }
-
-            if (transform.position.y < -18f)
-            {
-                RestartLevel();
-            }
-
-            UpdateAnimationState();
-        }
+        Movement();
     }
+
+    // private void Update()
+    // {
+    //     if(GetComponent<Health>().currentHealth > 0)
+    //     {
+    //         dirX = Input.GetAxisRaw("Horizontal");
+    //         rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y);
+
+    //         if (Input.GetKeyDown(KeyCode.Escape))
+    //         {
+    //             if(!pauseMenuScreen.activeSelf)
+    //             {
+    //                 Time.timeScale = 0;
+    //                 pauseMenuScreen.SetActive(true);
+    //             }
+    //             else
+    //             {
+    //                 Time.timeScale = 1;
+    //                 pauseMenuScreen.SetActive(false);
+    //             }
+    //         }
+
+    //         if(Input.GetButtonDown("Jump") && IsGrounded())
+    //         {
+    //             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+    //         }
+
+    //         if (transform.position.y < -18f)
+    //         {
+    //             RestartLevel();
+    //         }
+
+    //         UpdateAnimationState();
+    //     }
+    // }
 
     private void UpdateAnimationState()
     {
@@ -75,13 +92,13 @@ public class PlayerMovement : MonoBehaviour
         
         if(GetComponent<Health>().currentHealth > 0)
         {
-            if (dirX > 0f)
+            if (moveRight)
             {
                 state = MovementState.running;
                 sprite.flipX = false;
                 isFacingRight = true;
             }
-            else if (dirX < 0f)
+            else if (moveLeft)
             {
                 state = MovementState.running;
                 sprite.flipX = true;
@@ -95,15 +112,21 @@ public class PlayerMovement : MonoBehaviour
             {
                 state = MovementState.jumping;
             }
-            if (Input.GetButtonDown("Fire1"))
+            if (rb.velocity.y < -0.1f)
+            {
+                state = MovementState.falling;
+                if(IsGrounded()){
+                state = MovementState.idle;
+            }
+            }
+            if (isattack == true && moveLeft == false && moveRight == false)
             {
                 state = MovementState.attack;
             }
+            
             anim.SetInteger("state", (int)state);
         }
     }
-
-    
 
     private bool IsGrounded()
     {
@@ -132,5 +155,102 @@ public class PlayerMovement : MonoBehaviour
             if(enemy.tag == "FlyEnemy")
                 enemy.GetComponent<Health>().TakeDamage(1, gameObject.tag);
         }
+    }
+
+    public void pointerDownLeft()
+    {
+        if(GetComponent<Health>().currentHealth > 0)
+        {
+            moveLeft = true;
+        }
+    }
+    public void pointerUpLeft()
+    {
+        if(GetComponent<Health>().currentHealth > 0)
+        {
+            moveLeft = false;
+        }
+    }
+    public void pointerDownRight()
+    {
+        if(GetComponent<Health>().currentHealth > 0)
+        {
+            moveRight = true;
+        }
+    }
+    public void pointerUpRight()
+    {
+        if(GetComponent<Health>().currentHealth > 0)
+        {
+            moveRight = false;
+        }
+    }
+    public void pointerDownJump()
+    {
+        if(GetComponent<Health>().currentHealth > 0)
+        {
+            isjumping = true;
+        }
+    }
+    public void pointerUpJump()
+    {
+        if(GetComponent<Health>().currentHealth > 0)
+        {
+            isjumping = false;
+        }
+    }
+    public void pointerDownAttack()
+    {
+        if(GetComponent<Health>().currentHealth > 0)
+        {
+            isattack = true;
+        }
+    }
+    public void pointerUpAttack()
+    {
+        if(GetComponent<Health>().currentHealth > 0)
+        {
+            isattack = false;
+        }
+    }
+
+    private void Movement()
+    {
+        if(moveLeft)
+        {
+            horizontalMove = -speed;
+        }
+        else if(moveRight)
+        {
+            horizontalMove = speed;
+        }
+        else
+        {
+            horizontalMove = 0;
+        }
+
+        if(isjumping && IsGrounded())
+        {
+            // jumpSoundEffect.Play();
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        }
+
+        if(isattack && !moveLeft && !moveRight)
+        {
+            // attackSoundEffect.Play();
+            anim.SetInteger("state", 3);
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        rb.velocity = new Vector2(horizontalMove, rb.velocity.y);
+
+        if (transform.position.y < -18f)
+        {
+            RestartLevel();
+        }
+
+        UpdateAnimationState();
     }
 }

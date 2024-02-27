@@ -195,9 +195,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackCooldown: 1.5
-  range: 0.5
+  range: 0.75
   damage: 1
-  colliderDistance: 2.5
+  colliderDistance: 1.7
   boxCollider: {fileID: 7550905152731966066}
   playerLayer:
     serializedVersion: 2
@@ -215,5 +215,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startingHealth: 3
+  hurtJumpForce: 5
   iframesDuration: 1
   numberOfFlashes: 2
+  deathSoundEffect: {fileID: 0}
+  hurtSoundEffect: {fileID: 0}

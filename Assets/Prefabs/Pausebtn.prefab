@@ -134,6 +134,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: StartMenu, Assembly-CSharp
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &8907238173204960452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,7 +158,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d32c80a8d9255f247a1a9c924c7a83ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttons: []
   pauseMenuScreen: {fileID: 0}
+  mobileControls: {fileID: 0}
+  pausebtn: {fileID: 0}
 --- !u!1 &9024726310281916528
 GameObject:
   m_ObjectHideFlags: 0

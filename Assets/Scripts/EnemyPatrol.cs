@@ -68,7 +68,7 @@ public class EnemyPatrol : MonoBehaviour
             }
     }
 
-    public void MoveInDirection(int _direction)
+    private void MoveInDirection(int _direction)
     {
         idleTimer = 0;
         anim.SetBool("moving", true);

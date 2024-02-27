@@ -5,7 +5,7 @@ public class MeleeEnemy : MonoBehaviour
     [Header("Attack Parameters")]
     [SerializeField] private float attackCooldown;
     [SerializeField] private float range;
-    [SerializeField] private int damage;
+    [SerializeField] private float damage;
 
     [Header("Collide Parameters")]
     [SerializeField] private float colliderDistance;
@@ -43,6 +43,29 @@ public class MeleeEnemy : MonoBehaviour
             enemyPatrol.enabled = !PlayerInSight();
     }
 
+    public void HandleHurt()
+    {
+        // Check if the player is in the "hit" range
+        if (PlayerInSight())
+        {
+            // Player is in range, no need to rotate
+            return;
+        }
+
+        // Change the patrol direction based on the current movement direction
+        if (enemyPatrol != null)
+        {
+            if (enemyPatrol.IsMovingLeft())
+            {
+                enemyPatrol.SetMovingLeft(false);
+            }
+            else
+            {
+                enemyPatrol.SetMovingLeft(true);
+            }
+        }
+    }
+
     public bool PlayerInSight()
     {
         RaycastHit2D hit = Physics2D.BoxCast(boxCollider.bounds.center + transform.right * range * transform.localScale.x * colliderDistance,
@@ -70,34 +93,6 @@ public class MeleeEnemy : MonoBehaviour
         if(PlayerInSight())
         {
             playerHealth.TakeDamage(damage, gameObject.tag);
-        }
-    }
-
-    // public void RotateWizard()
-    // {
-    //     // Flip the wizard by rotating it 180 degrees along the y-axis
-    //     transform.Rotate(0f, 180f, 0f);
-    // }
-
-    public void HandleHurt()
-    {
-        // Check if the player is in the "hit" range
-        if (PlayerInSight())
-        {
-            // Player in range, no rotate
-            return;
-        }
-
-        if (enemyPatrol != null)
-        {
-            if (enemyPatrol.IsMovingLeft())
-            {
-                enemyPatrol.SetMovingLeft(false);
-            }
-            else
-            {
-                enemyPatrol.SetMovingLeft(true);
-            }
         }
     }
 
